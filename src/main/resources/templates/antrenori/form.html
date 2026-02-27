@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ro" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Antrenor</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Sala Fitness</div>
+</nav>
+
+<main class="content_form">
+    <h1 th:text="${antrenor.id == null ? 'Adaugă antrenor' : 'Update antrenor'}"></h1>
+
+    <form th:action="@{/antrenori/save}" th:object="${antrenor}" method="post"
+          class="modal-content" style="max-width:560px;">
+        <div class="modal-header">
+            <h3>Formular antrenor</h3>
+            <a class="btn btn-ghost" th:href="@{/}" style="text-decoration: none;">✕</a>
+        </div>
+
+        <div class="form-grid">
+            <input type="hidden" th:field="*{id}"/>
+
+            <div>
+                <label>Nume</label>
+                <input th:field="*{nume}">
+                <div class="err" th:if="${#fields.hasErrors('nume')}" th:errors="*{nume}"></div>
+            </div>
+
+            <div>
+                <label>Prenume</label>
+                <input th:field="*{prenume}">
+                <div class="err" th:if="${#fields.hasErrors('prenume')}" th:errors="*{prenume}"></div>
+            </div>
+
+            <div>
+                <label>Telefon</label>
+                <input th:field="*{telefon}">
+                <div class="err" th:if="${#fields.hasErrors('telefon')}" th:errors="*{telefon}"></div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <a class="btn btn-ghost" th:href="@{/}" style="text-decoration: none;">Renunță</a>
+            <button class="btn btn-primary" type="submit">Salvează</button>
+        </div>
+    </form>
+</main>
+
+</body>
+</html>

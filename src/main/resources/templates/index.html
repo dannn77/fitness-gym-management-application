@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ro" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${appName}">Sala Fitness</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo" th:text="${appName}">Sala Fitness</div>
+    <ul class="nav-links">
+        <li data-section="dashboard" class="active">Dashboard</li>
+        <li data-section="membri">Membri</li>
+        <li data-section="abonamente">Abonamente</li>
+        <li data-section="antrenori">Antrenori</li>
+        <li data-section="sali">Săli</li>
+        <li data-section="antrenamente">Antrenamente</li>
+        <li data-section="programari">Programări</li>
+    </ul>
+</nav>
+
+<main class="content">
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section active">
+        <h1>Dashboard</h1>
+
+        <div class="cards">
+            <div class="card">
+                <h2>Membri</h2>
+                <p class="value" th:text="${countMembri}">0</p>
+                <p class="label">membri înregistrați</p>
+            </div>
+            <div class="card">
+                <h2>Abonamente</h2>
+                <p class="value" th:text="${countAbonamente}">0</p>
+                <p class="label">abonamente</p>
+            </div>
+            <div class="card">
+                <h2>Antrenori</h2>
+                <p class="value" th:text="${countAntrenori}">0</p>
+                <p class="label">antrenori</p>
+            </div>
+            <div class="card">
+                <h2>Programări</h2>
+                <p class="value" th:text="${countProgramari}">0</p>
+                <p class="label">programări</p>
+            </div>
+        </div>
+
+        <div class="dashboard-panel">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <h2 style="margin:0;">Filtru membri după abonament</h2>
+
+            <form th:action="@{/}" method="get" class="dashboard-filter">
+                <select name="abonamentId" onchange="this.form.submit()">
+                    <option value="">— Selectează abonament —</option>
+                    <option th:each="a : ${abonamente}"
+                            th:value="${a.id}"
+                            th:text="${a.tipAbonament}"
+                            th:selected="${abonamentIdSelectat != null and abonamentIdSelectat == a.id}">
+                    </option>
+                </select>
+            </form>
+
+        </div>
+
+            <div style="margin-top:12px;">
+                <p th:if="${abonamentIdSelectat == null}" style="margin:0;">
+                    Selectează un abonament pentru a afișa membrii.
+                </p>
+
+                <p th:if="${abonamentIdSelectat != null and #lists.isEmpty(membriFiltrati)}" style="margin:0;">
+                    Nu există membri cu abonamentul selectat.
+                </p>
+
+                <table th:if="${abonamentIdSelectat != null and !#lists.isEmpty(membriFiltrati)}" class="table" style="margin-top:8px;">
+                    <thead>
+                    <tr>
+                        <th>Nume</th>
+                        <th>Prenume</th>
+                        <th>Telefon</th>
+                        <th>Start</th>
+                        <th>Expirare</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="m : ${membriFiltrati}">
+                        <td th:text="${m.nume}"></td>
+                        <td th:text="${m.prenume}"></td>
+                        <td th:text="${m.telefon}"></td>
+                        <td th:text="${m.dataStart}"></td>
+                        <td th:text="${m.dataExpirare}"></td>
+                        <td th:text="${m.statusAbonament}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dashboard-panel" style="margin-top:16px;">
+            <h2 style="margin:0 0 10px 0;">Următoarele 3 programări</h2>
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Membru</th>
+                    <th>Antrenament</th>
+                    <th>Antrenor</th>
+                    <th>Sală</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${urmatoarele3Programari}">
+                    <td th:text="${p.dataProgramare}"></td>
+
+                    <td th:text="${p.membru != null ? p.membru.numeComplet : ''}"></td>
+
+                    <td th:text="${p.antrenament != null ? p.antrenament.denumireAntrenament : ''}"></td>
+
+                    <td th:text="${(p.antrenament != null && p.antrenament.antrenor != null) ? p.antrenament.antrenor.numeComplet : ''}"></td>
+
+                    <td th:text="${(p.antrenament != null && p.antrenament.sala != null) ? p.antrenament.sala.denumireSala : ''}"></td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(urmatoarele3Programari)}">
+                    <td colspan="5" style="padding:12px;">Nu există programări viitoare.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="dashboard-panel" style="margin-top:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <h2 style="margin:0;">Antrenori peste medie (lună selectată)</h2>
+
+                <form th:action="@{/}" method="get" class="dashboard-filter">
+                    <label style="margin-right:8px;">Alege luna:</label>
+                    <select name="luna" onchange="this.form.submit()">
+                        <option th:each="l : ${luni}"
+                                th:value="${l}"
+                                th:text="${T(java.time.Month).of(l).getDisplayName(T(java.time.format.TextStyle).FULL, new java.util.Locale('ro','RO'))}"
+                                th:selected="${lunaSelectata == l}">
+                        </option>
+                    </select>
+                </form>
+            </div>
+
+            <table class="table" style="margin-top:10px;">
+                <thead>
+                <tr>
+                    <th>Antrenor</th>
+                    <th>Nr. programări</th>
+                    <th>Lună</th>
+                    <th>An</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${antrenoriPesteMedie}">
+                    <td th:text="${e.key}"></td>
+                    <td th:text="${e.value}"></td>
+                    <td th:text="${numeLunaSelectata}"></td>
+                    <td th:text="${anSelectat}"></td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(antrenoriPesteMedie)}">
+                    <td colspan="4" style="padding:12px;">
+                        Nu există antrenori peste medie pentru luna selectată.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    </section>
+
+    <!-- MEMBRI -->
+    <section id="membri" class="section">
+        <h1>Membri</h1>
+        <div class="section-toolbar">
+            <a class="btn btn-primary" th:href="@{/membri/new}" style="text-decoration: none;">+ Adaugă membru</a>
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Nume</th>
+                <th>Prenume</th>
+                <th>CNP</th>
+                <th>Sex</th>
+                <th>Telefon</th>
+                <th>Data start</th>
+                <th>Data expirare</th>
+                <th>Abonament</th>
+                <th>Acțiuni</th>
+                <th>Status abonament</th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="m : ${membri}">
+                <td th:text="${m.nume}"></td>
+                <td th:text="${m.prenume}"></td>
+                <td th:text="${m.cnp} ?: ''"></td>
+                <td th:text="${m.sex} ?: ''"></td>
+                <td th:text="${m.telefon} ?: ''"></td>
+                <td th:text="${m.dataStart} ?: ''"></td>
+                <td th:text="${m.dataExpirare} ?: ''"></td>
+                <td th:text="${m.abonament != null ? m.abonament.tipAbonament : '—'}"></td>
+
+                <td>
+                    <div class="table-actions">
+                        <a class="btn btn-sm btn-ghost" th:href="@{/membri/{id}/edit(id=${m.id})}" style="text-decoration: none;">Update</a>
+                        <form th:action="@{/membri/{id}/delete(id=${m.id})}" method="post" style="display:inline;"
+                              onsubmit="return confirm('Sigur vrei să ștergi acest membru?');">
+                            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </td>
+
+                <td>
+                  <span th:text="${m.statusAbonament}"
+                        th:classappend="
+                          ${m.statusAbonament == 'Finalizat'} ? 'status-final' :
+                          (${m.statusAbonament == 'În desfășurare'} ? 'status-active' : 'status-future')
+                        ">
+                  </span>
+                </td>
+
+
+                <td>
+                    <form th:if="${m.statusAbonament == 'Finalizat'}"
+                          th:action="@{/membri/{id}/renew(id=${m.id})}"
+                          method="post">
+                        <button class="btn btn-primary btn-sm">
+                            Reia abonamentul
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+
+    <!-- ABONAMENTE -->
+    <section id="abonamente" class="section">
+        <h1>Abonamente</h1>
+        <div class="section-toolbar">
+            <a class="btn btn-primary" th:href="@{/abonamente/new}" style="text-decoration: none;">+ Adaugă abonament</a>
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Tip</th><th>Preț</th><th>Acces sală</th><th>Acces antrenament trainer</th><th>Acțiuni</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${abonamente}">
+                <td th:text="${a.tipAbonament}"></td>
+                <td th:text="${a.pret} + ' lei'"></td>
+                <td th:text="${a.accesSalaGrup ? 'Da' : 'Nu'}"></td>
+                <td th:text="${a.accesPersonalTrainer ? 'Da' : 'Nu'}"></td>
+                <td>
+                    <div class="table-actions">
+                        <a class="btn btn-sm btn-ghost" th:href="@{/abonamente/{id}/edit(id=${a.id})}" style="text-decoration: none;">Update</a>
+                        <form th:action="@{/abonamente/{id}/delete(id=${a.id})}" method="post" style="display:inline;"
+                              onsubmit="return confirm('Sigur vrei să ștergi acest abonament?');">
+                            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ANTRENORI -->
+    <section id="antrenori" class="section">
+        <h1>Antrenori</h1>
+        <div class="section-toolbar">
+            <a class="btn btn-primary" th:href="@{/antrenori/new}" style="text-decoration: none;">+ Adaugă antrenor</a>
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Nume</th><th>Prenume</th><th>Telefon</th><th>Acțiuni</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${antrenori}">
+                <td th:text="${t.nume}"></td>
+                <td th:text="${t.prenume}"></td>
+                <td th:text="${t.telefon}"></td>
+                <td>
+                    <div class="table-actions">
+                        <a class="btn btn-sm btn-ghost" th:href="@{/antrenori/{id}/edit(id=${t.id})}" style="text-decoration: none;">Update</a>
+                        <form th:action="@{/antrenori/{id}/delete(id=${t.id})}" method="post" style="display:inline;"
+                              onsubmit="return confirm('Sigur vrei să ștergi acest antrenor?');">
+                            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- SĂLI -->
+    <section id="sali" class="section">
+        <h1>Săli</h1>
+        <div class="section-toolbar">
+            <a class="btn btn-primary" th:href="@{/sali/new}" style="text-decoration: none;">+ Adaugă sală</a>
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Denumire</th><th>Capacitate</th><th>Acțiuni</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s : ${sali}">
+                <td th:text="${s.denumireSala}"></td>
+                <td th:text="${s.capacitate}"></td>
+                <td>
+                    <div class="table-actions">
+                        <a class="btn btn-sm btn-ghost" th:href="@{/sali/{id}/edit(id=${s.id})}" style="text-decoration: none;">Update</a>
+                        <form th:action="@{/sali/{id}/delete(id=${s.id})}" method="post" style="display:inline;"
+                              onsubmit="return confirm('Sigur vrei să ștergi această sală?');">
+                            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ANTRENAMENTE -->
+    <section id="antrenamente" class="section">
+        <h1>Antrenamente</h1>
+        <div class="section-toolbar">
+            <a class="btn btn-primary" th:href="@{/antrenamente/new}" style="text-decoration: none;">+ Adaugă antrenament</a>
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Denumire</th><th>Tip</th><th>Durată</th><th>Sală</th><th>Antrenor</th><th>Capacitate</th><th>Acțiuni</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${antrenamente}">
+                <td th:text="${a.denumireAntrenament}"></td>
+                <td th:text="${a.tipAntrenament}"></td>
+                <td th:text="${a.durata} + ' minute'"></td>
+                <td th:text="${a.sala != null ? a.sala.denumireSala : '—'}"></td>
+                <td th:text="${a.antrenor != null ? a.antrenor.numeComplet : '—'}"></td>
+                <td th:text="${a.capacitate}"></td>
+                <td>
+                    <div class="table-actions">
+                        <a class="btn btn-sm btn-ghost" th:href="@{/antrenamente/{id}/edit(id=${a.id})}" style="text-decoration: none;">Update</a>
+                        <form th:action="@{/antrenamente/{id}/delete(id=${a.id})}" method="post" style="display:inline;"
+                              onsubmit="return confirm('Sigur vrei să ștergi acest antrenament?');">
+                            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- PROGRAMĂRI -->
+    <section id="programari" class="section">
+        <h1>Programări</h1>
+        <div class="section-toolbar">
+            <a class="btn btn-primary" th:href="@{/programari/new}" style="text-decoration: none;">+ Adaugă programare</a>
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Membru</th><th>Antrenament</th><th>Data</th><th>Acțiuni</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${programari}">
+                <td th:text="${p.membru != null ? p.membru.numeComplet : '—'}"></td>
+                <td th:text="${p.antrenament != null ? p.antrenament.denumireAntrenament : '—'}"></td>
+                <td th:text="${p.dataProgramare}"></td>
+                <td>
+                    <div class="table-actions">
+                        <a class="btn btn-sm btn-ghost" th:href="@{/programari/{id}/edit(id=${p.id})}" style="text-decoration: none;">Update</a>
+                        <form th:action="@{/programari/{id}/delete(id=${p.id})}" method="post" style="display:inline;"
+                              onsubmit="return confirm('Sigur vrei să ștergi această programare?');">
+                            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const navItems = document.querySelectorAll(".nav-links li");
+      const sections = document.querySelectorAll(".section");
+
+      navItems.forEach(item => {
+        item.addEventListener("click", () => {
+          const target = item.getAttribute("data-section");
+
+          navItems.forEach(i => i.classList.remove("active"));
+          item.classList.add("active");
+
+          sections.forEach(sec => {
+            if (sec.id === target) sec.classList.add("active");
+            else sec.classList.remove("active");
+          });
+        });
+      });
+    });
+</script>
+
+</body>
+</html>

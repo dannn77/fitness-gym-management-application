@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ro" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Programare</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Sala Fitness</div>
+</nav>
+
+<main class="content_form">
+    <h1 th:text="${programare.id == null ? 'Adaugă programare' : 'Update programare'}"></h1>
+
+    <form th:action="@{/programari/save}" th:object="${programare}" method="post"
+          class="modal-content" style="max-width:760px;">
+        <div class="modal-header">
+            <h3>Formular programare</h3>
+            <a class="btn btn-ghost" th:href="@{/}" style="text-decoration: none;">✕</a>
+        </div>
+
+        <div class="form-grid">
+            <input type="hidden" th:field="*{id}"/>
+
+            <div class="full">
+                <label>Membru</label>
+                <select th:field="*{idMembru}">
+                    <option value="">— Alege —</option>
+                    <option th:each="m : ${membri}" th:value="${m.id}" th:text="${m.numeComplet}"></option>
+                </select>
+                <div class="err" th:if="${#fields.hasErrors('idMembru')}" th:errors="*{idMembru}"></div>
+            </div>
+
+            <div class="full">
+                <label>Antrenament</label>
+                <select th:field="*{idAntrenament}">
+                    <option value="">— Alege —</option>
+                    <option th:each="a : ${antrenamente}" th:value="${a.id}" th:text="${a.denumireAntrenament}"></option>
+                </select>
+                <div class="err" th:if="${#fields.hasErrors('idAntrenament')}" th:errors="*{idAntrenament}"></div>
+            </div>
+
+            <div class="full">
+                <label>Data</label>
+                <input type="date" th:field="*{dataProgramare}">
+                <div class="err" th:if="${#fields.hasErrors('dataProgramare')}" th:errors="*{dataProgramare}"></div>
+            </div>
+        </div>
+        <div class="err" th:if="${flashMsg}" th:text="${flashMsg}"></div>
+
+        <div class="modal-footer">
+            <a class="btn btn-ghost" th:href="@{/}" style="text-decoration: none;">Renunță</a>
+            <button class="btn btn-primary" type="submit">Salvează</button>
+        </div>
+    </form>
+</main>
+
+</body>
+</html>

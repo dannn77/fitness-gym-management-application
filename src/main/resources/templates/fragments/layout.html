@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ro" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle} ?: 'Sala Fitness'">Sala Fitness</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Sala Fitness</div>
+    <ul class="nav-links">
+        <li th:classappend="${activePage=='dashboard'} ? 'active' : ''">
+            <a th:href="@{/}" style="color:inherit;text-decoration:none;">Dashboard</a>
+        </li>
+        <li th:classappend="${activePage=='membri'} ? 'active' : ''">
+            <a th:href="@{/membri}" style="color:inherit;text-decoration:none;">Membri</a>
+        </li>
+        <li th:classappend="${activePage=='abonamente'} ? 'active' : ''">
+            <a th:href="@{/abonamente}" style="color:inherit;text-decoration:none;">Abonamente</a>
+        </li>
+        <li th:classappend="${activePage=='antrenori'} ? 'active' : ''">
+            <a th:href="@{/antrenori}" style="color:inherit;text-decoration:none;">Antrenori</a>
+        </li>
+        <li th:classappend="${activePage=='sali'} ? 'active' : ''">
+            <a th:href="@{/sali}" style="color:inherit;text-decoration:none;">Săli</a>
+        </li>
+        <li th:classappend="${activePage=='antrenamente'} ? 'active' : ''">
+            <a th:href="@{/antrenamente}" style="color:inherit;text-decoration:none;">Antrenamente</a>
+        </li>
+        <li th:classappend="${activePage=='programari'} ? 'active' : ''">
+            <a th:href="@{/programari}" style="color:inherit;text-decoration:none;">Programări</a>
+        </li>
+    </ul>
+</nav>
+
+<main class="content" th:fragment="content">
+</main>
+
+<script>
+    function confirmDelete(msg){ return confirm(msg || "Sigur vrei să ștergi?"); }
+</script>
+
+</body>
+</html>

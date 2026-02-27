@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ro" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Antrenament</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Sala Fitness</div>
+</nav>
+
+<main class="content_form">
+    <h1 th:text="${antrenament.id == null ? 'Adaugă antrenament' : 'Update antrenament'}"></h1>
+
+    <form th:action="@{/antrenamente/save}" th:object="${antrenament}" method="post"
+          class="modal-content" style="max-width:760px;">
+        <div class="modal-header">
+            <h3>Formular antrenament</h3>
+            <a class="btn btn-ghost" th:href="@{/}" style="text-decoration: none;">✕</a>
+        </div>
+
+        <div class="form-grid">
+            <input type="hidden" th:field="*{id}"/>
+
+            <div class="full">
+                <label>Denumire</label>
+                <input th:field="*{denumireAntrenament}">
+                <div class="err" th:if="${#fields.hasErrors('denumireAntrenament')}" th:errors="*{denumireAntrenament}"></div>
+            </div>
+
+            <div>
+                <label>Tip</label>
+                <select th:field="*{tipAntrenament}">
+                    <option value="">— Selectează —</option>
+                    <option value="G">Greu</option>
+                    <option value="M">Mediu</option>
+                    <option value="U">Ușor</option>
+                </select>
+                <div class="err" th:if="${#fields.hasErrors('tipAntrenament')}" th:errors="*{tipAntrenament}"></div>
+            </div>
+
+            <div>
+                <label>Durată (min)</label>
+                <input type="text" th:field="*{durata}">
+                <div class="err" th:if="${#fields.hasErrors('durata')}" th:errors="*{durata}"></div>
+            </div>
+
+            <div>
+                <label>Capacitate</label>
+                <input type="text" th:field="*{capacitate}">
+                <div class="err" th:if="${#fields.hasErrors('capacitate')}" th:errors="*{capacitate}"></div>
+            </div>
+
+            <div class="full">
+                <label>Sală</label>
+                <select th:field="*{idSala}">
+                    <option value="">— Selectează —</option>
+                    <option th:each="s : ${sali}"
+                            th:value="${s.id}"
+                            th:text="${s.denumireSala}">
+                    </option>
+                </select>
+                <div class="err"
+                     th:if="${#fields.hasErrors('idSala')}"
+                     th:errors="*{idSala}">
+                </div>
+            </div>
+
+            <div class="full">
+                <label>Antrenor</label>
+                <select th:field="*{idAntrenor}">
+                    <option value="">— Selectează —</option>
+                    <option th:each="t : ${antrenori}" th:value="${t.id}" th:text="${t.numeComplet}"></option>
+                </select>
+                <div class="err" th:if="${#fields.hasErrors('idAntrenor')}" th:errors="*{idAntrenor}"></div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <a class="btn btn-ghost" th:href="@{/}" style="text-decoration: none;">Renunță</a>
+            <button class="btn btn-primary" type="submit">Salvează</button>
+        </div>
+    </form>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ro" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sala</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Sala Fitness</div>
+</nav>
+
+<main class="content_form">
+    <h1 th:text="${sala.id == null ? 'Adaugă sală' : 'Update sală'}"></h1>
+
+    <form th:action="@{/sali/save}" th:object="${sala}" method="post"
+          class="modal-content" style="max-width:560px;">
+        <div class="modal-header">
+            <h3>Formular sală</h3>
+            <a class="btn btn-ghost" th:href="@{/}" style="text-decoration: none;">✕</a>
+        </div>
+
+        <div class="form-grid">
+            <input type="hidden" th:field="*{id}"/>
+
+            <div class="full">
+                <label>Denumire</label>
+                <input th:field="*{denumireSala}">
+                <div class="err" th:if="${#fields.hasErrors('denumireSala')}" th:errors="*{denumireSala}"></div>
+            </div>
+
+            <div>
+                <label>Capacitate</label>
+                <input type="text" th:field="*{capacitate}">
+                <div class="err" th:if="${#fields.hasErrors('capacitate')}" th:errors="*{capacitate}"></div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <a class="btn btn-ghost" th:href="@{/}" style="text-decoration: none;">Renunță</a>
+            <button class="btn btn-primary" type="submit">Salvează</button>
+        </div>
+    </form>
+</main>
+
+</body>
+</html>

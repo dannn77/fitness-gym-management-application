@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ro" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Membru</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Sala Fitness</div>
+</nav>
+
+<main class="content_form">
+    <h1 th:text="${membru.id == null ? 'Adaugă membru' : 'Update membru'}"></h1>
+
+    <form th:action="@{/membri/save}" th:object="${membru}" method="post"
+          class="modal-content" style="max-width:760px;">
+        <div class="modal-header">
+            <h3>Formular membru</h3>
+            <a class="btn btn-ghost" th:href="@{/}" style="text-decoration: none;">✕</a>
+        </div>
+
+        <div class="form-grid">
+            <input type="hidden" th:field="*{id}"/>
+
+            <div>
+                <label>Nume</label>
+                <input th:field="*{nume}">
+                <div class="err" th:if="${#fields.hasErrors('nume')}" th:errors="*{nume}"></div>
+            </div>
+
+            <div>
+                <label>Prenume</label>
+                <input th:field="*{prenume}">
+                <div class="err" th:if="${#fields.hasErrors('prenume')}" th:errors="*{prenume}"></div>
+            </div>
+
+            <div>
+                <label>CNP</label>
+                <input th:field="*{cnp}">
+                <div class="err" th:if="${#fields.hasErrors('cnp')}" th:errors="*{cnp}"></div>
+            </div>
+
+            <div>
+                <label>Sex (M/F)</label>
+                <select th:field="*{sex}">
+                    <option value="">— Selectează —</option>
+                    <option value="M">M</option>
+                    <option value="F">F</option>
+                </select>
+                <div class="err" th:if="${#fields.hasErrors('sex')}" th:errors="*{sex}"></div>
+            </div>
+
+            <div>
+                <label>Telefon</label>
+                <input th:field="*{telefon}">
+                <div class="err" th:if="${#fields.hasErrors('telefon')}" th:errors="*{telefon}"></div>
+            </div>
+
+            <div>
+                <label>Data start</label>
+                <input type="date" th:field="*{dataStart}" id="dataStart">
+                <div class="err"
+                     th:if="${#fields.hasErrors('dataStart')}"
+                     th:errors="*{dataStart}">
+                </div>
+            </div>
+
+            <div>
+                <label>Data expirare</label>
+                <input type="date" th:field="*{dataExpirare}" id="dataExpirare" readonly />
+                <div class="err"
+                     th:if="${#fields.hasErrors('dataExpirare')}"
+                     th:errors="*{dataExpirare}">
+                </div>
+            </div>
+
+            <div class="full">
+                <label>Abonament</label>
+                <select th:field="*{idAbonament}" id="abonamentSelect">
+                    <option value="">— Selectează abonament —</option>
+                    <option th:each="a : ${abonamente}"
+                            th:value="${a.id}"
+                            th:text="${a.tipAbonament}"
+                            th:attr="data-tip=${a.tipAbonament}">
+                    </option>
+                </select>
+                <div class="err"
+                     th:if="${#fields.hasErrors('idAbonament')}"
+                     th:errors="*{idAbonament}">
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <a class="btn btn-ghost" th:href="@{/}" style="text-decoration: none;">Renunță</a>
+            <button class="btn btn-primary" type="submit">Salvează</button>
+        </div>
+    </form>
+</main>
+
+<script>
+    const startInput = document.getElementById('dataStart');
+    const expirareInput = document.getElementById('dataExpirare');
+    const abonamentSelect = document.getElementById('abonamentSelect');
+
+    function addMonthsToISODate(isoDate, monthsToAdd) {
+      const [y, m, d] = isoDate.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+
+      const originalDay = dt.getDate();
+      dt.setMonth(dt.getMonth() + monthsToAdd);
+
+      if (dt.getDate() !== originalDay) {
+        dt.setDate(0);
+      }
+
+      const yyyy = dt.getFullYear();
+      const mm = String(dt.getMonth() + 1).padStart(2, '0');
+      const dd = String(dt.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function getMonthsFromSelectedAbonament() {
+      const opt = abonamentSelect.options[abonamentSelect.selectedIndex];
+      const tip = (opt?.dataset?.tip || "").trim().toLowerCase();
+
+      const primulCuvant = tip.split(/\s+/)[0];
+
+      if (primulCuvant === "lunar") return 1;
+      if (primulCuvant === "anual") return 12;
+      return null;
+    }
+
+    function recalcExpirare() {
+      const start = startInput.value; // YYYY-MM-DD
+      const luni = getMonthsFromSelectedAbonament();
+
+      if (!start || luni == null) {
+        expirareInput.value = "";
+        return;
+      }
+
+      expirareInput.value = addMonthsToISODate(start, luni);
+    }
+
+    startInput.addEventListener('change', recalcExpirare);
+    abonamentSelect.addEventListener('change', recalcExpirare);
+
+    document.addEventListener('DOMContentLoaded', recalcExpirare);
+</script>
+
+</body>
+</html>
+
